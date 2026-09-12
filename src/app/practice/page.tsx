@@ -220,7 +220,7 @@ export default function PracticePage() {
               <span>Problem {questionIndex + 1}</span>
               <span>
                 {mode === "daily"
-                  ? `Fact #{(sessionStartIndex + questionIndex) % 45 + 1}/45`
+                  ? `Fact #${((sessionStartIndex + questionIndex) % 45) + 1}/45`
                   : `${remainingSeconds}s`}
               </span>
             </div>
