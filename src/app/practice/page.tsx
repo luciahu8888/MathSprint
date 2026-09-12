@@ -133,8 +133,8 @@ export default function PracticePage() {
     setIsLocked(true);
     setFeedback(
       isCorrect
-        ? `太棒了！${currentQuestion.operands[0]} x ${currentQuestion.operands[1]} = ${currentQuestion.correctAnswer}`
-        : `继续加油！${currentQuestion.operands[0]} x ${currentQuestion.operands[1]} = ${currentQuestion.correctAnswer}`,
+        ? `Awesome! ${currentQuestion.operands[0]} x ${currentQuestion.operands[1]} = ${currentQuestion.correctAnswer}`
+        : `Keep going! ${currentQuestion.operands[0]} x ${currentQuestion.operands[1]} = ${currentQuestion.correctAnswer}`,
     );
 
     // Save progress to localStorage immediately.
@@ -190,7 +190,7 @@ export default function PracticePage() {
           <div className="mt-4 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 p-4">
             {mode === "daily" ? (
               <>
-                <p className="text-xs font-semibold text-orange-700">口诀进度</p>
+                <p className="text-xs font-semibold text-orange-700">Progress</p>
                 <div className="mt-1 h-2 overflow-hidden rounded-full bg-orange-200">
                   <div
                     className="h-full rounded-full bg-orange-500"
@@ -198,18 +198,18 @@ export default function PracticePage() {
                   />
                 </div>
                 <p className="mt-1 text-xs font-semibold text-orange-800">
-                  第 {(savedFactIndex % 45) + 1} / 45 条 · {DAILY_QUESTION_GOAL} 题/次
+                  Fact {(savedFactIndex % 45) + 1} / 45 · {DAILY_QUESTION_GOAL} problems/session
                 </p>
               </>
             ) : (
-              <p className="text-sm font-semibold text-orange-950">60秒内答对越多越好！</p>
+              <p className="text-sm font-semibold text-orange-950">Answer as many as you can in 60 seconds!</p>
             )}
             <button
               type="button"
               onClick={startSession}
               className="mt-4 w-full rounded-2xl bg-orange-500 px-4 py-3 text-base font-extrabold text-white shadow-md"
             >
-              {mode === "daily" ? "开始练习" : "开始冲刺"}
+              {mode === "daily" ? "Start Practice" : "Start Sprint"}
             </button>
           </div>
         ) : null}
@@ -217,10 +217,10 @@ export default function PracticePage() {
         {started && currentQuestion ? (
           <div className="mt-4">
             <div className="mb-3 flex items-center justify-between text-sm font-semibold text-sky-900">
-              <span>第 {questionIndex + 1} 题</span>
+              <span>Problem {questionIndex + 1}</span>
               <span>
                 {mode === "daily"
-                  ? `口诀 ${(sessionStartIndex + questionIndex) % 45 + 1}/45`
+                  ? `Fact #{(sessionStartIndex + questionIndex) % 45 + 1}/45`
                   : `${remainingSeconds}s`}
               </span>
             </div>
@@ -246,30 +246,30 @@ export default function PracticePage() {
 
             <p
               className={`mt-3 rounded-xl px-3 py-2 text-sm font-semibold ${
-                feedback.startsWith("太棒")
+                feedback.startsWith("Awesome")
                   ? "bg-emerald-100 text-emerald-900"
                   : feedback
                     ? "bg-rose-100 text-rose-900"
                     : "bg-slate-100 text-slate-700"
               }`}
             >
-              {feedback || "选择你的答案"}
+              {feedback || "Choose your answer"}
             </p>
           </div>
         ) : null}
 
         {!started && sessionAttempts.length > 0 ? (
           <div className="mt-4 rounded-2xl bg-emerald-100 p-4 text-emerald-950">
-            <p className="text-lg font-black">练习完成！</p>
-            <p className="mt-1 text-sm font-semibold">正确率: {sessionAccuracy}%</p>
+            <p className="text-lg font-black">Practice Complete!</p>
+            <p className="mt-1 text-sm font-semibold">Accuracy: {sessionAccuracy}%</p>
             <p className="text-sm font-semibold">
-              平均速度: {formatMs(sessionAttempts.reduce((s, a) => s + a.responseTimeMs, 0) / sessionAttempts.length)}
+              Avg Speed: {formatMs(sessionAttempts.reduce((s, a) => s + a.responseTimeMs, 0) / sessionAttempts.length)}
             </p>
             <Link
               href="/review"
               className="mt-3 inline-block rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
             >
-              去复习
+              Review
             </Link>
           </div>
         ) : null}
