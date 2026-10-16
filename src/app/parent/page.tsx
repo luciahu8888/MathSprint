@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { getAttempts, getFactStatsMap } from "@/lib/storage";
-import type { AnswerAttempt, FactStats } from "@/lib/types";
+import type { AnswerAttempt, FactStats, QuestionType } from "@/lib/types";
 
 function percent(value: number): string {
   return `${Math.round(value * 100)}%`;
@@ -23,6 +23,25 @@ function last7Days(): string[] {
   }
 
   return result;
+}
+
+function getSymbol(type: QuestionType): string {
+  switch (type) {
+    case "division":
+      return "÷";
+    case "addition":
+      return "+";
+    case "subtraction":
+      return "-";
+    case "multiplication":
+    case "mixed":
+    default:
+      return "x";
+  }
+}
+
+function formatFact(operands: [number, number], type: QuestionType): string {
+  return `${operands[0]} ${getSymbol(type)} ${operands[1]}`;
 }
 
 export default function ParentStatsPage() {
@@ -96,7 +115,7 @@ export default function ParentStatsPage() {
           <ul className="mt-3 space-y-2">
             {mostMissed.map((fact) => (
               <li key={fact.key} className="rounded-2xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-950">
-                {fact.operands[0]} x {fact.operands[1]} • missed {fact.incorrectAttempts} times
+                {formatFact(fact.operands, fact.questionType)} • missed {fact.incorrectAttempts} times
               </li>
             ))}
           </ul>
@@ -111,7 +130,7 @@ export default function ParentStatsPage() {
           <ul className="mt-3 space-y-2">
             {slowestFacts.map((fact) => (
               <li key={fact.key} className="rounded-2xl bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-950">
-                {fact.operands[0]} x {fact.operands[1]} • {(fact.averageResponseTimeMs / 1000).toFixed(1)}s average
+                {formatFact(fact.operands, fact.questionType)} • {(fact.averageResponseTimeMs / 1000).toFixed(1)}s average
               </li>
             ))}
           </ul>

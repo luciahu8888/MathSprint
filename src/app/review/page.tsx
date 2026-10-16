@@ -2,12 +2,27 @@
 
 import { useMemo, useState } from "react";
 import { getAttempts, getFactStatsMap } from "@/lib/storage";
-import type { AnswerAttempt, FactStats } from "@/lib/types";
+import type { AnswerAttempt, FactStats, QuestionType } from "@/lib/types";
 
 const PRIORITY_KEYS = new Set(["multiplication:6x7", "multiplication:7x8", "multiplication:8x9", "multiplication:9x7"]);
 
-function formatFact(operands: [number, number]): string {
-  return `${operands[0]} x ${operands[1]}`;
+function getSymbol(type: QuestionType): string {
+  switch (type) {
+    case "division":
+      return "÷";
+    case "addition":
+      return "+";
+    case "subtraction":
+      return "-";
+    case "multiplication":
+    case "mixed":
+    default:
+      return "x";
+  }
+}
+
+function formatFact(operands: [number, number], type: QuestionType): string {
+  return `${operands[0]} ${getSymbol(type)} ${operands[1]}`;
 }
 
 export default function ReviewPage() {
@@ -61,7 +76,7 @@ export default function ReviewPage() {
           <ul className="mt-3 space-y-2">
             {weakFacts.map((fact) => (
               <li key={fact.key} className="rounded-2xl bg-amber-50 px-3 py-2">
-                <p className="font-black text-amber-950">{formatFact(fact.operands)}</p>
+                <p className="font-black text-amber-950">{formatFact(fact.operands, fact.questionType)}</p>
                 <p className="text-xs font-semibold text-amber-900">
                   Mastery: {fact.masteryLevel} • Missed: {fact.incorrectAttempts} • Avg time: {Math.round(fact.averageResponseTimeMs)}ms
                 </p>
@@ -79,7 +94,7 @@ export default function ReviewPage() {
           <ul className="mt-3 space-y-2">
             {missed.map((attempt) => (
               <li key={attempt.id} className="rounded-2xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-950">
-                {formatFact(attempt.operands)} = {attempt.correctAnswer}, you picked {attempt.selectedAnswer}
+                {formatFact(attempt.operands, attempt.questionType)} = {attempt.correctAnswer}, you picked {attempt.selectedAnswer}
               </li>
             ))}
           </ul>
@@ -94,7 +109,7 @@ export default function ReviewPage() {
           <ul className="mt-3 space-y-2">
             {slowCorrect.map((attempt) => (
               <li key={attempt.id} className="rounded-2xl bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-950">
-                {formatFact(attempt.operands)} in {(attempt.responseTimeMs / 1000).toFixed(1)}s
+                {formatFact(attempt.operands, attempt.questionType)} in {(attempt.responseTimeMs / 1000).toFixed(1)}s
               </li>
             ))}
           </ul>

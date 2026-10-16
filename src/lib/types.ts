@@ -1,7 +1,10 @@
 export type QuestionType = "multiplication" | "addition" | "subtraction" | "division" | "mixed";
 
+export type PracticeMode = "daily" | "division-facts" | "large-small";
+
 export interface AnswerAttempt {
   id: string;
+  practiceMode?: PracticeMode;
   questionType: QuestionType;
   operands: [number, number];
   correctAnswer: number;
@@ -36,6 +39,7 @@ export interface PracticeQuestion {
 export interface DailySummary {
   date: string;
   attempts: number;
+  dailyQuestAttempts: number;
   correct: number;
   accuracy: number;
   averageResponseTimeMs: number;

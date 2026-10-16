@@ -3,7 +3,8 @@ import type { AnswerAttempt, DailySummary, FactStats, MasteryLevel, QuestionType
 
 const ATTEMPTS_KEY = "mathquest.attempts.v1";
 const FACTS_KEY = "mathquest.factStats.v1";
-const FACT_INDEX_KEY = "mathquest.factIndex.v1";
+
+export const DAILY_MULTIPLICATION_GOAL = 45;
 
 function isClient(): boolean {
   return typeof window !== "undefined";
@@ -51,12 +52,8 @@ function dateOnly(iso: string): string {
   return new Date(iso).toISOString().slice(0, 10);
 }
 
-export function getOrderedFactIndex(): number {
-  return readJson<number>(FACT_INDEX_KEY, 0);
-}
-
-export function saveOrderedFactIndex(index: number): void {
-  writeJson(FACT_INDEX_KEY, index);
+function isDailyQuestAttempt(attempt: AnswerAttempt): boolean {
+  return attempt.questionType === "multiplication" && (attempt.practiceMode ?? "daily") === "daily";
 }
 
 export function getAttempts(): AnswerAttempt[] {
@@ -125,6 +122,7 @@ export function updateFactsFromAttempts(newAttempts: AnswerAttempt[]): void {
 
 export function summarizeDay(date: string): DailySummary {
   const attempts = getAttempts().filter((attempt) => dateOnly(attempt.timestamp) === date);
+  const dailyQuestAttempts = attempts.filter((attempt) => isDailyQuestAttempt(attempt)).length;
   const count = attempts.length;
   const correct = attempts.filter((attempt) => attempt.isCorrect).length;
   const accuracy = count > 0 ? correct / count : 0;
@@ -134,6 +132,7 @@ export function summarizeDay(date: string): DailySummary {
   return {
     date,
     attempts: count,
+    dailyQuestAttempts,
     correct,
     accuracy,
     averageResponseTimeMs,
@@ -141,10 +140,24 @@ export function summarizeDay(date: string): DailySummary {
 }
 
 export function getCompletedDates(): Set<string> {
-  const set = new Set<string>();
+  const dayDailyQuestCount: Record<string, number> = {};
+
   for (const attempt of getAttempts()) {
-    set.add(dateOnly(attempt.timestamp));
+    if (!isDailyQuestAttempt(attempt)) {
+      continue;
+    }
+
+    const day = dateOnly(attempt.timestamp);
+    dayDailyQuestCount[day] = (dayDailyQuestCount[day] ?? 0) + 1;
   }
+
+  const set = new Set<string>();
+  for (const [day, count] of Object.entries(dayDailyQuestCount)) {
+    if (count >= DAILY_MULTIPLICATION_GOAL) {
+      set.add(day);
+    }
+  }
+
   return set;
 }
 
@@ -167,11 +180,11 @@ export function getCurrentStreak(todayIsoDate: string): number {
 }
 
 export function getTodayTaskText(todaySummary: DailySummary): string {
-  if (todaySummary.attempts >= 20) {
-    return "Awesome! Daily goal complete. Try a 60-second challenge.";
+  if (todaySummary.dailyQuestAttempts >= DAILY_MULTIPLICATION_GOAL) {
+    return "Awesome! Daily goal complete. You finished all 45 multiplication questions.";
   }
 
-  return "Answer 20 multiplication questions or play the 60-second challenge.";
+  return "Finish all 45 multiplication questions for today’s check-in.";
 }
 
 export function getTypeLabel(type: QuestionType): string {

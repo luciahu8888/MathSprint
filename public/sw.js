@@ -1,4 +1,4 @@
-const CACHE_NAME = "mathquest-v1";
+const CACHE_NAME = "mathquest-v2";
 const APP_SHELL = ["/", "/practice", "/review", "/calendar", "/parent", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
@@ -25,6 +25,23 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") {
+    return;
+  }
+
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (!response || response.status !== 200 || response.type !== "basic") {
+            return response;
+          }
+
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached ?? caches.match("/"))),
+    );
     return;
   }
 

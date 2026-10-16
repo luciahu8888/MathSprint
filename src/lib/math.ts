@@ -37,6 +37,17 @@ function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function shuffleArray<T>(values: T[]): T[] {
+  const next = [...values];
+
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    const swapIndex = randomInt(0, index);
+    [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
+  }
+
+  return next;
+}
+
 function factKey(a: number, b: number, type: QuestionType): string {
   return `${type}:${a}x${b}`;
 }
@@ -70,6 +81,28 @@ function buildChoices(correctAnswer: number): number[] {
   while (values.size < 4) {
     const variation = randomInt(-9, 9);
     const candidate = Math.max(0, correctAnswer + variation);
+    if (candidate !== correctAnswer) {
+      values.add(candidate);
+    }
+  }
+
+  return Array.from(values).sort(() => Math.random() - 0.5);
+}
+
+function buildLargeNumberChoices(left: number, right: number, correctAnswer: number): number[] {
+  const values = new Set<number>([correctAnswer]);
+  const nearbySmallFactors = [Math.max(2, right - 1), Math.min(9, right + 1)];
+
+  for (const factor of nearbySmallFactors) {
+    const candidate = left * factor;
+    if (candidate !== correctAnswer) {
+      values.add(candidate);
+    }
+  }
+
+  while (values.size < 4) {
+    const variation = randomInt(-Math.max(12, right * 3), Math.max(12, right * 3));
+    const candidate = Math.max(0, correctAnswer + variation * 2);
     if (candidate !== correctAnswer) {
       values.add(candidate);
     }
@@ -183,5 +216,50 @@ export function generateOrderedMultiplicationQuestion(index: number): PracticeQu
     prompt: `${left} x ${right} = ?`,
     correctAnswer,
     choices: buildChoices(correctAnswer),
+  };
+}
+
+export function generateShuffledDailyQuestQuestions(): PracticeQuestion[] {
+  return shuffleArray(ORDERED_MULTIPLICATION_FACTS).map(([left, right]) => {
+    const correctAnswer = left * right;
+
+    return {
+      questionType: "multiplication",
+      operands: [left, right],
+      prompt: `${left} x ${right} = ?`,
+      correctAnswer,
+      choices: buildChoices(correctAnswer),
+    };
+  });
+}
+
+export function generateShuffledDivisionFactQuestions(): PracticeQuestion[] {
+  return shuffleArray(ORDERED_MULTIPLICATION_FACTS).map(([left, right]) => {
+    const useLeftAsDivisor = left !== right && Math.random() < 0.5;
+    const dividend = left * right;
+    const divisor = useLeftAsDivisor ? left : right;
+    const correctAnswer = useLeftAsDivisor ? right : left;
+
+    return {
+      questionType: "division",
+      operands: [dividend, divisor],
+      prompt: `${dividend} ÷ ${divisor} = ?`,
+      correctAnswer,
+      choices: buildChoices(correctAnswer),
+    };
+  });
+}
+
+export function generateLargeSmallMultiplicationQuestion(): PracticeQuestion {
+  const left = randomInt(12, 99);
+  const right = randomInt(2, 9);
+  const correctAnswer = left * right;
+
+  return {
+    questionType: "multiplication",
+    operands: [left, right],
+    prompt: `${left} x ${right} = ?`,
+    correctAnswer,
+    choices: buildLargeNumberChoices(left, right, correctAnswer),
   };
 }

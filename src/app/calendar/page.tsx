@@ -54,7 +54,7 @@ export default function CalendarPage() {
       <section className="mt-4 rounded-3xl bg-gradient-to-br from-orange-100 to-amber-200 p-4 shadow-lg ring-1 ring-amber-200">
         <p className="text-sm font-semibold text-orange-900">Current Streak</p>
         <p className="text-4xl font-black text-orange-950">{streak} days</p>
-        <p className="mt-1 text-xs font-semibold text-orange-900">Each day with at least one practice answer counts.</p>
+        <p className="mt-1 text-xs font-semibold text-orange-900">A day counts after finishing all 45 multiplication questions.</p>
       </section>
 
       <section className="mt-4 rounded-3xl bg-white p-4 shadow-lg ring-1 ring-sky-100">

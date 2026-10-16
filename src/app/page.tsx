@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { getCurrentStreak, getTodayTaskText, summarizeDay } from "@/lib/storage";
+import { DAILY_MULTIPLICATION_GOAL, getCurrentStreak, getTodayTaskText, summarizeDay } from "@/lib/storage";
 
 function todayIsoDate(): string {
   const now = new Date();
@@ -16,6 +16,7 @@ export default function Home() {
 
     return {
       todayAttempts: summary.attempts,
+      todayDailyQuestAttempts: summary.dailyQuestAttempts,
       todayAccuracy: summary.accuracy,
       todayAvgMs: summary.averageResponseTimeMs,
       streak: getCurrentStreak(today),
@@ -26,13 +27,17 @@ export default function Home() {
     return getTodayTaskText({
       date: todayIsoDate(),
       attempts: homeMetrics.todayAttempts,
+      dailyQuestAttempts: homeMetrics.todayDailyQuestAttempts,
       correct: Math.round(homeMetrics.todayAttempts * homeMetrics.todayAccuracy),
       accuracy: homeMetrics.todayAccuracy,
       averageResponseTimeMs: homeMetrics.todayAvgMs,
     });
-  }, [homeMetrics.todayAttempts, homeMetrics.todayAccuracy, homeMetrics.todayAvgMs]);
+  }, [homeMetrics.todayAttempts, homeMetrics.todayDailyQuestAttempts, homeMetrics.todayAccuracy, homeMetrics.todayAvgMs]);
 
-  const progressPercent = Math.min(100, Math.round((homeMetrics.todayAttempts / 20) * 100));
+  const progressPercent = Math.min(
+    100,
+    Math.round((homeMetrics.todayDailyQuestAttempts / DAILY_MULTIPLICATION_GOAL) * 100),
+  );
 
   return (
     <main className="px-4 pb-28 pt-5">
@@ -61,7 +66,7 @@ export default function Home() {
           <div className="h-full rounded-full bg-amber-200" style={{ width: `${progressPercent}%` }} />
         </div>
         <p className="mt-2 text-xs font-semibold text-sky-100">
-          Today progress: {homeMetrics.todayAttempts}/20 questions
+          Today progress: {homeMetrics.todayDailyQuestAttempts}/{DAILY_MULTIPLICATION_GOAL} daily quest questions
         </p>
       </section>
 
