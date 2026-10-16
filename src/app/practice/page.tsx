@@ -12,7 +12,7 @@ import { DAILY_MULTIPLICATION_GOAL, appendAttempts, updateFactsFromAttempts } fr
 import type { AnswerAttempt, PracticeMode, PracticeQuestion } from "@/lib/types";
 
 const DIVISION_FACT_QUESTION_GOAL = 45;
-const LARGE_SMALL_QUESTION_GOAL = 10;
+const LARGE_SMALL_QUESTION_GOAL = 45;
 
 function formatMs(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
@@ -192,7 +192,7 @@ export default function PracticePage() {
               </>
             ) : mode === "large-small" ? (
               <>
-                <p className="text-sm font-semibold text-orange-950">Practice 2-digit numbers times a 1-digit number.</p>
+                <p className="text-sm font-semibold text-orange-950">Practice one-digit multiplication with the bigger number first, like 6 x 5.</p>
                 <p className="mt-1 text-xs font-semibold text-orange-800">{LARGE_SMALL_QUESTION_GOAL} problems/session</p>
               </>
             ) : (

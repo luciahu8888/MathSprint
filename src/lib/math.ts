@@ -251,8 +251,8 @@ export function generateShuffledDivisionFactQuestions(): PracticeQuestion[] {
 }
 
 export function generateLargeSmallMultiplicationQuestion(): PracticeQuestion {
-  const left = randomInt(12, 99);
-  const right = randomInt(2, 9);
+  const left = randomInt(2, 9);
+  const right = randomInt(1, left - 1);
   const correctAnswer = left * right;
 
   return {
